@@ -1,5 +1,8 @@
 pipeline {
-    agent slave1
+    // agent any
+    agent {
+        label 'slave1' // Assign a default agent for the entire pipeline
+    }
     tools {
         nodejs 'nodejs'
     }

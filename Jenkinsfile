@@ -53,29 +53,11 @@ pipeline {
                 }
             }
         }
-        // stage ('Deploy') {
-        //     steps {
-        //         script {
-        //             sh "docker run -p 3000:80 -d --name ${env.CONTAINER_NAME} ${DOCKER_REGISTRY}/${imageTag}"
-        //         }
-        //     }
-        // }
-        // stage('Clone Repository') {
-        //     steps {
-        //         script {
-        //             sh 'rm -rf argocd-app-config'
-        //             // sh 'git clone https://github.com/KimheangKen/argocd-app-config.git'
-                    
-        //         }
-        //     }
-        // }
         
-        stage('Trigger ManifestUpdate') {
-            steps {
-                    build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-            }
-        }
-        
-
+        // stage('Trigger ManifestUpdate') {
+        //     steps {
+        //             build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+        //     }
+        // }        
     }
 }

@@ -15,6 +15,31 @@ pipeline {
     }
 
     stages {
+
+        stage('Push Notification') {
+            steps {
+                script {
+                    def buildStatus = currentBuild.currentResult
+                    def buildNumber = currentBuild.number
+                    def gitBranch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStatus: true).trim()
+                    def notificationMessage = "<b>Project</b>: Your Project Name\n"
+                    notificationMessage += "<b>Branch</b>: ${gitBranch}\n"
+                    notificationMessage += "<b>Build</b>: ${buildStatus}\n"
+                    notificationMessage += "<b>Build Number</b>: ${buildNumber}\n"
+
+                    // Send a notification to Telegram
+                    withCredentials([
+                        string(credentialsId: 'telegram-token', variable: 'TOKEN'),
+                        string(credentialsId: 'chat-id', variable: 'CHAT_ID')
+                    ]) {
+                        sh """
+                        curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage \
+                        -d chat_id=${CHAT_ID} -d parse_mode="HTML" -d text="${notificationMessage}"
+                        """
+                    }
+                }
+            }
+        }
         
 
         stage('Build') {
@@ -59,20 +84,8 @@ pipeline {
                 }
             }
         }
-        stage('Push Notification') {
-            steps {
-                script {
-                    def buildNumber = currentBuild.number
-                    // Send a notification to Telegram
-                    withCredentials([
-                        string(credentialsId: 'telegram-token', variable: 'TOKEN'),
-                        string(credentialsId: 'chat-id', variable: 'CHAT_ID')
-                    ]) {
-                        sh ' curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage -d chat_id=${CHAT_ID} -d parse_mode="HTML" -d text=" <b>Build Numver</b>:  ${buildNumber}" '
-                    }
-                }
-            }
-        }
+        
+
         
         stage('Trigger ManifestUpdate') {
             steps {

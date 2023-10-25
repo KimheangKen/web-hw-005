@@ -19,15 +19,7 @@ pipeline {
         stage('Notify Start') {
             steps {
                 script {
-                //     def message = """
-                //     🚀 Pipeline Started:
 
-                // Job Name: ${env.JOB_NAME}
-                // Job Description: ${env.JOB_DESCRIPTION}
-                // Version: ${BUILD_INFO}
-                // Committer: ${COMMITTER}
-                // Branch: ${BRANCH}
-                //     """
                     sendTelegramMessage("🚀 Pipeline Started:\nJob Name: ${env.JOB_NAME}\nJob Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                 }
             }
@@ -41,7 +33,7 @@ pipeline {
                         // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        def errorMessage = "❌ Build stage failed:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output Error:\n${currentBuild.rawBuild.getLog(100)"
+                        def errorMessage = "❌ Build stage failed:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output: [View Console Output](${env.BUILD_URL}/consoleText)"
                         sendTelegramMessage(errorMessage)
                         error(errorMessage)
                     }

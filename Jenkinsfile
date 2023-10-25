@@ -11,6 +11,7 @@ pipeline {
         DOCKER_REGISTRY = 'kimheang68'
         IMAGE_NAME = 'react-jenkin'
         CONTAINER_NAME = 'my-container' // Specify the name of your container
+
     }
 
     stages {
@@ -61,6 +62,7 @@ pipeline {
         stage('Push Notification') {
             steps {
                 script {
+                    def buildNumber = currentBuild.number
                     // Send a notification to Telegram
                     withCredentials([
                         string(credentialsId: 'telegram-token', variable: 'TOKEN'),

@@ -47,14 +47,20 @@ pipeline {
         stage('Check for Existing Container') {
             steps {
                 script {
-                    def containerId = sh(script: "docker ps -a --filter name=${env.CONTAINER_NAME} -q", returnStdout: true).trim()
-                    sh "echo containerId is ${containerId}" 
-                    if (containerId) {
-                        sh "docker stop ${containerId}"
-                        sh "docker rm ${containerId}"
-                        sendTelegramMessage("✅ Container cleanup succeeded")
-                    } else {
-                        sendTelegramMessage("✅ No existing container to remove")
+                    try {
+                        def containerId = sh(script: "docker ps -a --filter name=${env.CONTAINER_NAME} -q", returnStdout: true).trim()
+                        sh "echo containerId is ${containerId}" 
+                        if (containerId) {
+                            sh "docker stop ${containerId}"
+                            sh "docker rm ${containerId}"
+                            sendTelegramMessage("✅ Container cleanup succeeded")
+                        } else {
+                            sendTelegramMessage("✅ No existing container to remove")
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Check for Existing Container stage failed: ${e.message}")
+                        error("Check for Existing Container stage failed: ${e.message}")
                     }
                 }
             }
@@ -84,13 +90,15 @@ pipeline {
         }
         stage('Trigger ManifestUpdate') {
             steps {
-                try {
-                    build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-                    sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded")
-                } catch (Exception e) {
-                    currentBuild.result = 'FAILURE'
-                    sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}")
-                    error("Trigger ManifestUpdate stage failed: ${e.message}")
+                script {
+                    try {
+                        build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                        sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded")
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}")
+                        error("Trigger ManifestUpdate stage failed: ${e.message}")
+                    }
                 }
             }
         }

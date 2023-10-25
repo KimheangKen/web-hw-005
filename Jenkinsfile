@@ -22,7 +22,7 @@ pipeline {
                         string(credentialsId: 'telegram-token', variable: 'TOKEN'),
                         string(credentialsId: 'chat-id', variable: 'CHAT_ID')
                     ]) {
-                        telegramSend(message: 'test message', chatId: -4098383966)
+                        sh ' curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage -d chat_id=${CHAT_ID} -d parse_mode="HTML" -d text="<b>Project</b>: POC <b>Branch</b>: master <b>Build</b>: OK <b>Test suite</b>: failed" '
                     }
                 }
             }

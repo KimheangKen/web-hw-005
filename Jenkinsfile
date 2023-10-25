@@ -21,7 +21,7 @@ pipeline {
                 script {
                     def buildStatus = currentBuild.currentResult
                     def buildNumber = currentBuild.number
-                    def gitBranch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStatus: true).trim()
+                    def gitBranch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
                     def notificationMessage = "<b>Project</b>: Your Project Name\n"
                     notificationMessage += "<b>Branch</b>: ${gitBranch}\n"
                     notificationMessage += "<b>Build</b>: ${buildStatus}\n"

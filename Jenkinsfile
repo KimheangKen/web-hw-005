@@ -14,19 +14,7 @@ pipeline {
     }
 
     stages {
-        stage('Push Notification') {
-            steps {
-                script {
-                    // Send a notification to Telegram
-                    withCredentials([
-                        string(credentialsId: 'telegram-token', variable: 'TOKEN'),
-                        string(credentialsId: 'chat-id', variable: 'CHAT_ID')
-                    ]) {
-                        sh ' curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage -d chat_id=${CHAT_ID} -d parse_mode="HTML" -d text="<b>Project</b>: POC <b>Branch</b>: master <b>Build</b>: OK <b>Test suite</b>: failed" '
-                    }
-                }
-            }
-        }
+        
 
         stage('Build') {
             steps {
@@ -66,6 +54,19 @@ pipeline {
                             passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                         sh "echo \$PASS | docker login -u \$USER --password-stdin"
                         sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
+                    }
+                }
+            }
+        }
+        stage('Push Notification') {
+            steps {
+                script {
+                    // Send a notification to Telegram
+                    withCredentials([
+                        string(credentialsId: 'telegram-token', variable: 'TOKEN'),
+                        string(credentialsId: 'chat-id', variable: 'CHAT_ID')
+                    ]) {
+                        sh ' curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage -d chat_id=${CHAT_ID} -d parse_mode="HTML" -d text=" <b>Build Numver</b>:  ${buildNumber}" '
                     }
                 }
             }

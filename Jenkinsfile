@@ -15,19 +15,19 @@ pipeline {
 
     stages {
         stage('Push Notification') {
-
-           steps {
-                script{
+            steps {
+                script {
                     // Send a notification to Telegram
                     withCredentials([
                         string(credentialsId: 'telegram-token', variable: 'TOKEN'),
                         string(credentialsId: 'chat-id', variable: 'CHAT_ID')
                     ]) {
-                        telegramSend(message: 'test message', chatId: CHAT_ID)
+                        telegramSend(message: 'test message', chatId: env.CHAT_ID)
                     }
                 }
             }
         }
+
         stage('Build') {
             steps {
                 sh 'npm install'

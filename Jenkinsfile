@@ -1,3 +1,4 @@
+
 pipeline {
     agent {
         label 'jk-worker1'
@@ -46,13 +47,80 @@ pipeline {
                 }
             }
         }
-        // Add your other stages here
+        stage('Test') {
+            steps {
+                script {
+                    try {
+                        // sh 'npm run test'
+                        echo "Test"
+                        sh "echo IMAGE_NAME is ${env.IMAGE_NAME}"
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Test stage failed: ${e.message}")
+                        error("Test stage failed: ${e.message}")
+                    }
+                }
+            }
+        }
+        stage('Check for Existing Container') {
+            steps {
+                script {
+                    try {
+                        def containerId = sh(script: "docker ps -a --filter name=${env.CONTAINER_NAME} -q", returnStdout: true).trim()
+                        sh "echo containerId is ${containerId}" 
+                        if (containerId) {
+                            sh "docker stop ${containerId}"
+                            sh "docker rm ${containerId}"
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Check for Existing Container stage failed: ${e.message}")
+                        error("Check for Existing Container stage failed: ${e.message}")
+                    }
+                }
+            }
+        }
+        stage('Build Image') {
+            steps {
+                script {
+                    try {
+                        def buildNumber = currentBuild.number
+                        def imageTag = "${IMAGE_NAME}:${buildNumber}"
+                        sh "docker build -t ${DOCKER_REGISTRY}/${imageTag} ."
+
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-cred',
+                                passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                            sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                            sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Build Image stage failed: ${e.message}")
+                        error("Build Image stage failed: ${e.message}")
+                    }
+                }
+            }
+        }
+        stage('Trigger ManifestUpdate') {
+            steps {
+                script {
+                    try {
+                        build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}")
+                        error("Trigger ManifestUpdate stage failed: ${e.message}")
+                    }
+                }
+            }
+        }
     }
 
     post {
         success {
             sendTelegramMessage("✅ All stages succeeded")
         }
+        
     }
 }
 

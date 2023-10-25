@@ -11,7 +11,7 @@ pipeline {
         CONTAINER_NAME = 'my-container'
         TELEGRAM_BOT_TOKEN = credentials('telegram-token')
         TELEGRAM_CHAT_ID = credentials('chat-id')
-        BUILD_VERSION = currentBuild.number
+        BUILD_INFO = "${currentBuild.number}"
         COMMITTER = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true).trim()
         BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
     }
@@ -24,7 +24,7 @@ pipeline {
 
                     Job Name: ${env.JOB_NAME}
                     Job Description: ${env.JOB_DESCRIPTION}
-                    Version: ${VERSION_INFO}
+                    Version: ${BUILD_INFO}
                     Committer: ${COMMITTER}
                     Branch: ${BRANCH}
                     """

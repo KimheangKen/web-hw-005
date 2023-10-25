@@ -19,16 +19,16 @@ pipeline {
         stage('Notify Start') {
             steps {
                 script {
-                    def message = """
-                    🚀 Pipeline Started:
+                //     def message = """
+                //     🚀 Pipeline Started:
 
-                Job Name: ${env.JOB_NAME}
-                Job Description: ${env.JOB_DESCRIPTION}
-                Version: ${BUILD_INFO}
-                Committer: ${COMMITTER}
-                Branch: ${BRANCH}
-                    """
-                    sendTelegramMessage(message)
+                // Job Name: ${env.JOB_NAME}
+                // Job Description: ${env.JOB_DESCRIPTION}
+                // Version: ${BUILD_INFO}
+                // Committer: ${COMMITTER}
+                // Branch: ${BRANCH}
+                //     """
+                    sendTelegramMessage("🚀 Pipeline Started:\nJob Name: ${env.JOB_NAME}\nJob Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                 }
             }
         }

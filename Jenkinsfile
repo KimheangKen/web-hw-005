@@ -22,7 +22,6 @@ pipeline {
                 script {
                     def message = """
                     🚀 Pipeline Started:
-
                     Job Name: ${env.JOB_NAME}
                     Job Description: ${env.JOB_DESCRIPTION}
                     Version: ${VERSION_INFO}
@@ -118,7 +117,17 @@ pipeline {
 
     post {
         success {
-            sendTelegramMessage("✅ All stages succeeded")
+            def message = """
+                    🚀 Pipeline :
+                    ✅ All stages succeeded
+                    Job Name: ${env.JOB_NAME}
+                    Job Description: ${env.JOB_DESCRIPTION}
+                    Version: ${VERSION_INFO}
+                    Committer: ${COMMITTER}
+                    Branch: ${BRANCH}
+                    """
+            sendTelegramMessage(message)
+            // sendTelegramMessage("✅ All stages succeeded")
         }
         
     }

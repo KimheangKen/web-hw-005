@@ -57,10 +57,10 @@ pipeline {
             }
         }
         
-        // stage('Trigger ManifestUpdate') {
-        //     steps {
-        //             build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-        //     }
-        // }        
+        stage('Trigger ManifestUpdate') {
+            steps {
+                    build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
+        }        
     }
 }

@@ -11,7 +11,7 @@ pipeline {
         CONTAINER_NAME = 'my-container'
         TELEGRAM_BOT_TOKEN = credentials('telegram-token')
         TELEGRAM_CHAT_ID = credentials('chat-id')
-        VERSION_INFO = sh(script: 'git describe --tags --always', returnStdout: true).trim()
+        BUILD_VERSION = currentBuild.number
         COMMITTER = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true).trim()
         BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
     }
@@ -38,7 +38,7 @@ pipeline {
                     try {
                         sh 'npm install'
                         // sh 'npm run build'
-                        sendTelegramMessage("✅ Build stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         sendTelegramMessage("❌ Build stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
@@ -54,7 +54,7 @@ pipeline {
                         // sh 'npm run test'
                         echo "Test"
                         sh "echo IMAGE_NAME is ${env.IMAGE_NAME}"
-                        sendTelegramMessage("✅ Test stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Test stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         sendTelegramMessage("❌ Test stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
@@ -72,9 +72,9 @@ pipeline {
                         if (containerId) {
                             sh "docker stop ${containerId}"
                             sh "docker rm ${containerId}"
-                            sendTelegramMessage("✅ Container cleanup succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ Container cleanup succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         } else {
-                            sendTelegramMessage("✅ No existing container to remove\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ No existing container to remove\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
@@ -96,7 +96,7 @@ pipeline {
                                 passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                             sh "echo \$PASS | docker login -u \$USER --password-stdin"
                             sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
-                            sendTelegramMessage("✅ Build Image stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ Build Image stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
@@ -111,7 +111,7 @@ pipeline {
                 script {
                     try {
                         build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-                        sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")

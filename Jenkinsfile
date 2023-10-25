@@ -18,7 +18,6 @@ pipeline {
         }
         stage('Test') {
             steps {
-                // sh 'npm run test'
                 echo "Test"
                 sh "echo IMAGE_NAME is ${env.IMAGE_NAME}" 
             }
@@ -52,31 +51,21 @@ pipeline {
                 }
             }
         }
-        
-
-        
         stage('Trigger ManifestUpdate') {
             steps {
-                    build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
             }
         }
     }
     post {
-        always {
+        failure {
             script {
-                def buildStatus = currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
+                def buildStatus = 'FAILURE'
                 def jobName = env.JOB_NAME
                 def buildNumber = env.BUILD_NUMBER
-                def buildLog = currentBuild.rawBuild.getLog(1000)
 
-                // Build the message
-                def message = """
-                Build Status: $buildStatus
-                Job Name: $jobName
-                Build Number: $buildNumber
-                Build Log:
-                $buildLog
-                """
+                // Archive the build log
+                archiveArtifacts artifacts: 'build.log', allowEmptyArchive: true
 
                 // Send the message to Telegram
                 withCredentials([
@@ -84,10 +73,8 @@ pipeline {
                     string(credentialsId: 'chat-id', variable: 'CHAT_ID')
                 ]) {
                     sh """
-                    curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage \
-                    -d chat_id=${CHAT_ID} \
-                    -d parse_mode="HTML" \
-                    -d text="${message}"
+                    curl -F document=@build.log https://api.telegram.org/bot${TOKEN}/sendDocument \
+                    -F chat_id=${CHAT_ID} -F caption="Build failed: $jobName #$buildNumber"
                     """
                 }
             }

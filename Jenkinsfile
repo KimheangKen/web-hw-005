@@ -51,6 +51,7 @@ pipeline {
                 }
             }
         }
+
         stage('Trigger ManifestUpdate') {
             steps {
                 build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
@@ -72,9 +73,10 @@ pipeline {
                     string(credentialsId: 'telegram-token', variable: 'TOKEN'),
                     string(credentialsId: 'chat-id', variable: 'CHAT_ID')
                 ]) {
+                    // Corrected the use of single quotes to preserve variables
                     sh """
-                    curl -F document=@build.log https://api.telegram.org/bot${TOKEN}/sendDocument \
-                    -F chat_id=${CHAT_ID} -F caption="Build failed: $jobName #$buildNumber"
+                    curl -F document=@build.log https://api.telegram.org/bot\${TOKEN}/sendDocument \
+                    -F chat_id=\${CHAT_ID} -F caption="Build failed: \${jobName} #\${buildNumber}"
                     """
                 }
             }

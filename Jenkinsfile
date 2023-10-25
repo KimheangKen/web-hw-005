@@ -9,17 +9,39 @@ pipeline {
         DOCKER_REGISTRY = 'kimheang68'
         IMAGE_NAME = 'react-jenkin'
         CONTAINER_NAME = 'my-container'
+        TELEGRAM_BOT_TOKEN = credentials('telegram-token')
+        TELEGRAM_CHAT_ID = credentials('chat-id')
     }
     stages {
         stage('Build') {
             steps {
-                sh 'npn install' // Intentional typo to make it fail
+                script {
+                    try {
+                        sh 'npm install'
+                        // sh 'npm run build'
+                        sendTelegramMessage("✅ Build stage succeeded")
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Build stage failed: ${e.message}")
+                        error("Build stage failed: ${e.message}")
+                    }
+                }
             }
         }
         stage('Test') {
             steps {
-                echo "Test"
-                sh "echo IMAGE_NAME is ${env.IMAGE_NAME}" 
+                script {
+                    try {
+                        // sh 'npm run test'
+                        echo "Test"
+                        sh "echo IMAGE_NAME is ${env.IMAGE_NAME}"
+                        sendTelegramMessage("✅ Test stage succeeded")
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Test stage failed: ${e.message}")
+                        error("Test stage failed: ${e.message}")
+                    }
+                }
             }
         }
         stage('Check for Existing Container') {
@@ -30,8 +52,9 @@ pipeline {
                     if (containerId) {
                         sh "docker stop ${containerId}"
                         sh "docker rm ${containerId}"
+                        sendTelegramMessage("✅ Container cleanup succeeded")
                     } else {
-                        sh "echo No existing container to remove"
+                        sendTelegramMessage("✅ No existing container to remove")
                     }
                 }
             }
@@ -39,47 +62,45 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    def buildNumber = currentBuild.number
-                    def imageTag = "${IMAGE_NAME}:${buildNumber}"
-                    sh "docker build -t ${DOCKER_REGISTRY}/${imageTag} ."
+                    try {
+                        def buildNumber = currentBuild.number
+                        def imageTag = "${IMAGE_NAME}:${buildNumber}"
+                        sh "docker build -t ${DOCKER_REGISTRY}/${imageTag} ."
 
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-cred',
-                            passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
-                        sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-cred',
+                                passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                            sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                            sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
+                        }
+
+                        sendTelegramMessage("✅ Build Image stage succeeded")
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Build Image stage failed: ${e.message}")
+                        error("Build Image stage failed: ${e.message}")
                     }
                 }
             }
         }
-
         stage('Trigger ManifestUpdate') {
             steps {
-                build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-            }
-        }
-    }
-    post {
-        failure {
-            script {
-                def buildStatus = 'FAILURE'
-                def jobName = env.JOB_NAME
-                def buildNumber = env.BUILD_NUMBER
-
-                // Archive the build log
-                archiveArtifacts artifacts: 'build.log', allowEmptyArchive: true
-
-                // Send the message to Telegram
-                withCredentials([
-                    string(credentialsId: 'telegram-token', variable: 'TOKEN'),
-                    string(credentialsId: 'chat-id', variable: 'CHAT_ID')
-                ]) {
-                    // Corrected the use of single quotes to preserve variables
-                    sh """
-                    curl -F document=@build.log https://api.telegram.org/bot\${TOKEN}/sendDocument \
-                    -F chat_id=\${CHAT_ID} -F caption="Build failed: \${jobName} #\${buildNumber}"
-                    """
+                try {
+                    build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                    sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded")
+                } catch (Exception e) {
+                    currentBuild.result = 'FAILURE'
+                    sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}")
+                    error("Trigger ManifestUpdate stage failed: ${e.message}")
                 }
             }
         }
+    }
+}
+
+def sendTelegramMessage(message) {
+    script {
+        sh """
+            curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage -d chat_id=\${TELEGRAM_CHAT_ID} -d parse_mode="HTML" -d text="${message}"
+        """
     }
 }

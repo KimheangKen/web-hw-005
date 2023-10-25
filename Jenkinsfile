@@ -1,7 +1,7 @@
 pipeline {
     // agent any
     agent {
-        label 'slave1' // Assign a default agent for the entire pipeline
+        label 'jk-worker1' // Assign a default agent for the entire pipeline
     }
     tools {
         nodejs 'nodejs'
@@ -57,10 +57,21 @@ pipeline {
             }
         }
         
-        // stage('Trigger ManifestUpdate') {
-        //     steps {
-        //             build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-        //     }
-        // }        
+        stage('Trigger ManifestUpdate') {
+            steps {
+                    build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
+        }
+        stage(‘Push Notification’) {
+
+           steps {
+                script{
+                    withCredentials([string(credentialsId: ‘telegram-cred’, variable: ‘TOKEN’),
+                    string(credentialsId: ‘chat-cred’, variable: ‘CHAT_ID’)]) {
+                        telegramSend(messsage:”test message”,chatId:${CHAT_ID})
+                    }
+                }
+            }
+        }
     }
 }

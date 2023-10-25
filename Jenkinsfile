@@ -22,7 +22,7 @@ pipeline {
                         string(credentialsId: 'telegram-token', variable: 'TOKEN'),
                         string(credentialsId: 'chat-id', variable: 'CHAT_ID')
                     ]) {
-                        telegramSend(message: 'test message', chatId: env.CHAT_ID)
+                        telegramSend(message: 'test message', chatId: -4098383966)
                     }
                 }
             }

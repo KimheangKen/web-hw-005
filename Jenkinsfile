@@ -1,57 +1,19 @@
 pipeline {
-    // agent any
     agent {
-        label 'jk-worker1' // Assign a default agent for the entire pipeline
+        label 'jk-worker1'
     }
     tools {
         nodejs 'nodejs'
     }
-
     environment {
         DOCKER_REGISTRY = 'kimheang68'
         IMAGE_NAME = 'react-jenkin'
-        CONTAINER_NAME = 'my-container' // Specify the name of your container
-
+        CONTAINER_NAME = 'my-container'
     }
-
     stages {
         stage('Build') {
             steps {
-                sh 'npm install'
-                // sh 'npm run build'
-            }
-        }
-        stage('Push Notification') {
-            steps {
-                script {
-                    // Send a notification to Telegram
-                    withCredentials([
-                        string(credentialsId: 'telegram-token', variable: 'TOKEN'),
-                        string(credentialsId: 'chat-id', variable: 'CHAT_ID')
-                    ]) {
-                        def buildStatus = currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
-                        def jobName = env.JOB_NAME
-                        def buildNumber = env.BUILD_NUMBER
-                        def buildLog = currentBuild.rawBuild.getLog(1000) // Adjust the number to get more or fewer lines from the build log
-
-                        // Build the message
-                        def message = """
-                        Build Status: $buildStatus
-                        Job Name: $jobName
-                        Build Number: $buildNumber
-                        Build Log:
-                        $buildLog
-                        """
-
-                        // Send the message to Telegram
-                        sh """
-                        curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage \
-                        -d chat_id=${CHAT_ID} \
-                        -d parse_mode="HTML" \
-                        -d text="${message}"
-                        """
-                    }
-                }
+                sh 'npn install' // Intentional typo to make it fail
             }
         }
         stage('Test') {
@@ -98,6 +60,37 @@ pipeline {
                     build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
             }
         }
-        
+    }
+    post {
+        always {
+            script {
+                def buildStatus = currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'
+                def jobName = env.JOB_NAME
+                def buildNumber = env.BUILD_NUMBER
+                def buildLog = currentBuild.rawBuild.getLog(1000)
+
+                // Build the message
+                def message = """
+                Build Status: $buildStatus
+                Job Name: $jobName
+                Build Number: $buildNumber
+                Build Log:
+                $buildLog
+                """
+
+                // Send the message to Telegram
+                withCredentials([
+                    string(credentialsId: 'telegram-token', variable: 'TOKEN'),
+                    string(credentialsId: 'chat-id', variable: 'CHAT_ID')
+                ]) {
+                    sh """
+                    curl -s -X POST https://api.telegram.org/bot${TOKEN}/sendMessage \
+                    -d chat_id=${CHAT_ID} \
+                    -d parse_mode="HTML" \
+                    -d text="${message}"
+                    """
+                }
+            }
+        }
     }
 }

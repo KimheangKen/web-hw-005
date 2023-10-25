@@ -38,10 +38,10 @@ pipeline {
                     try {
                         sh 'npm install'
                         // sh 'npm run build'
-                        // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Build stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Build stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Build stage failed: ${e.message}")
                     }
                 }
@@ -54,10 +54,10 @@ pipeline {
                         // sh 'npm run test'
                         echo "Test"
                         sh "echo IMAGE_NAME is ${env.IMAGE_NAME}"
-                        // sendTelegramMessage("✅ Test stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Test stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Test stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Test stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Test stage failed: ${e.message}")
                     }
                 }
@@ -72,13 +72,13 @@ pipeline {
                         if (containerId) {
                             sh "docker stop ${containerId}"
                             sh "docker rm ${containerId}"
-                            // sendTelegramMessage("✅ Container cleanup succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ Container cleanup succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         } else {
-                            // sendTelegramMessage("✅ No existing container to remove\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ No existing container to remove\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Check for Existing Container stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Check for Existing Container stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Check for Existing Container stage failed: ${e.message}")
                     }
                 }
@@ -96,11 +96,11 @@ pipeline {
                                 passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                             sh "echo \$PASS | docker login -u \$USER --password-stdin"
                             sh "docker push ${DOCKER_REGISTRY}/${imageTag}"
-                            // sendTelegramMessage("✅ Build Image stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                            // sendTelegramMessage("✅ Build Image stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Build Image stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Build Image stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Build Image stage failed: ${e.message}")
                     }
                 }
@@ -111,10 +111,10 @@ pipeline {
                 script {
                     try {
                         build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-                        // sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // sendTelegramMessage("✅ Trigger ManifestUpdate stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Trigger ManifestUpdate stage failed: ${e.message}")
                     }
                 }
@@ -124,7 +124,7 @@ pipeline {
 
     post {
         success {
-            sendTelegramMessage("✅ All stages succeeded\nVersion: ${VERSION_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+            sendTelegramMessage("✅ All stages succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
         }
     }
 }

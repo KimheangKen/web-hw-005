@@ -50,7 +50,7 @@ pipeline {
                         // sendTelegramMessage("✅ Test stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Test stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sendTelegramMessage("❌ Test stage <b> failed </b>: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                         error("Test stage failed: ${e.message}")
                     }
                 }

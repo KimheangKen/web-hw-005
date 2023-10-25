@@ -15,11 +15,6 @@ pipeline {
     }
 
     stages {
-
-        
-
-        
-
         stage('Build') {
             steps {
                 sh 'npn install'

@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'npm install'
+                        sh 'npn install'
                         // sh 'npm run build'
                         // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {

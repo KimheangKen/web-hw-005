@@ -62,12 +62,12 @@ pipeline {
                     build job: 'test2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
             }
         }
-        stage(‘Push Notification’) {
+        stage('Push Notification') {
 
            steps {
                 script{
-                    withCredentials([string(credentialsId: ‘telegram-cred’, variable: ‘TOKEN’),
-                    string(credentialsId: ‘chat-cred’, variable: ‘CHAT_ID’)]) {
+                    withCredentials([string(credentialsId: 'telegram-cred', variable: 'TOKEN'),
+                    string(credentialsId: 'chat-cred', variable: 'CHAT_ID')]) {
                         telegramSend(messsage:”test message”,chatId:${CHAT_ID})
                     }
                 }

@@ -41,8 +41,11 @@ pipeline {
                         // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Build stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
-                        error("Build stage failed: ${e.message}")
+                        def errorMessage = "❌ Build stage failed:\n${e.getMessage()\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}}"
+                        sendTelegramMessage(errorMessage)
+                        error(errorMessage)
+                        // sendTelegramMessage("❌ Build stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        // error("Build stage failed: ${e.message}")
                     }
                 }
             }

@@ -18,14 +18,14 @@ pipeline {
             steps {
                 script {
 
-                    sendTelegramMessagesendTelegramMessage("""
-                    🚀 Pipeline Started:
-                    Job Name: ${env.JOB_NAME}
-                    Job Description: ${env.JOB_DESCRIPTION}
-                    Version: ${BUILD_INFO}
-                    Committer: ${COMMITTER}
-                    Branch: ${BRANCH}
-                    """)
+                    sendTelegramMessage("""
+                        🚀 Pipeline Started:
+                        Job Name: ${env.JOB_NAME}
+                        Job Description: ${env.JOB_DESCRIPTION}
+                        Version: ${BUILD_INFO}
+                        Committer: ${COMMITTER}
+                        Branch: ${BRANCH}
+                        """)
                 }
             }
         }

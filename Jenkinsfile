@@ -19,14 +19,14 @@ pipeline {
                 script {
 
                     sendTelegramMessage("""
-                        <div>
+                        
                         🚀 Pipeline Started: </br>
                         <b>Job Name</b>: ${env.JOB_NAME}
                         Job Description: ${env.JOB_DESCRIPTION}
                         Version: ${BUILD_INFO}
                         Committer: ${COMMITTER}
                         Branch: ${BRANCH}
-                        </div>
+                        
                     """)
 
                 }
@@ -131,10 +131,8 @@ pipeline {
 
 def sendTelegramMessage(message) {
     script {
-        def encodedMessage = message.replaceAll('"', '\\"') // Escape double quotes
         sh """
-            curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage -d chat_id=\${TELEGRAM_CHAT_ID} -d parse_mode="HTML" -d text=\\"${encodedMessage}\\"
+            curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage -d chat_id=\${TELEGRAM_CHAT_ID} -d parse_mode="HTML" -d text="${message}"
         """
     }
 }
-

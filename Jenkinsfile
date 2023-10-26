@@ -20,7 +20,7 @@ pipeline {
 
                     sendTelegramMessage("""
                         
-                        🚀 Pipeline Started: </br>
+                        🚀 Pipeline Started: 
                         <b>Job Name</b>: ${env.JOB_NAME}
                         Job Description: ${env.JOB_DESCRIPTION}
                         Version: ${BUILD_INFO}

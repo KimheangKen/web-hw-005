@@ -21,7 +21,7 @@ pipeline {
                     sendTelegramMessage(
                         """
                         🚀 Pipeline Started:
-                        Job Name: ${env.JOB_NAME}
+                        \nJob Name: ${env.JOB_NAME}
                         Job Description: ${env.JOB_DESCRIPTION}
                         Version: ${BUILD_INFO}
                         Committer: ${COMMITTER}

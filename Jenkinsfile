@@ -21,7 +21,7 @@ pipeline {
                     sendTelegramMessage(
                         """
                         🚀 Pipeline Started:
-                        \nJob Name: ${env.JOB_NAME}
+                        \rJob Name: ${env.JOB_NAME}
                         Job Description: ${env.JOB_DESCRIPTION}
                         Version: ${BUILD_INFO}
                         Committer: ${COMMITTER}
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'npm install'
+                        sh 'npn install'
                         sh 'npm run build'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'

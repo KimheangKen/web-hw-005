@@ -24,7 +24,8 @@ pipeline {
                         """
                         🚀 Pipeline Started:
                         \n Job Name: ${env.JOB_NAME}
-                        \n Job Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}"""
+                        \n Job Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}
+                        """
                         )
                 }
             }

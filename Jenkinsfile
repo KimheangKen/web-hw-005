@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'jk-worker1'
+        any
     }
     tools {
         nodejs 'nodejs'
@@ -23,8 +23,11 @@ pipeline {
                     sendTelegramMessage(
                         """
                         🚀 Pipeline Started:
-                        \n Job Name: ${env.JOB_NAME}
-                        \n Job Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}
+                        Job Name: ${env.JOB_NAME}
+                        Job Description: ${env.JOB_DESCRIPTION}
+                        Version: ${BUILD_INFO}
+                        Committer: ${COMMITTER}
+                        Branch: ${BRANCH}
                         """
                         )
                 }

@@ -27,19 +27,23 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    def consoleOutput = ""
                     try {
-                        sh 'npm install'
-                        sh 'npm run build'
+                        consoleOutput = sh(script: 'npm install && npm run build', returnStatus: true).trim()
+                        if (currentBuild.resultIsBetterOrEqualTo('FAILURE')) {
+                            throw new Exception("Build failed")
+                        }
                         // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        def errorMessage = "❌ Build stage <b> failed </b>:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output: ${env.BUILD_URL}console"
+                        def errorMessage = "❌ Build stage failed:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output:\n```\n${consoleOutput}\n```"
                         sendTelegramMessage(errorMessage)
                         error(errorMessage)
                     }
                 }
             }
         }
+
         stage('Test') {
             steps {
                 script {

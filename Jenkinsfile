@@ -20,30 +20,30 @@ pipeline {
             steps {
                 script {
 
-                    sendTelegramMessage("🚀 Pipeline Started:\nJob Name: ${env.JOB_NAME}\nJob Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                    sendTelegramMessage(
+                        """
+                        🚀 Pipeline Started:
+                        \n Job Name: ${env.JOB_NAME}
+                        \n Job Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}"""
+                        )
                 }
             }
         }
         stage('Build') {
             steps {
                 script {
-                    def consoleOutput = ""
                     try {
-                        consoleOutput = sh(script: 'npm install && npm run build', returnStatus: true).trim()
-                        if (currentBuild.resultIsBetterOrEqualTo('FAILURE')) {
-                            throw new Exception("Build failed")
-                        }
-                        // sendTelegramMessage("✅ Build stage succeeded\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        sh 'npm install'
+                        sh 'npm run build'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
-                        def errorMessage = "❌ Build stage failed:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output:\n```\n${consoleOutput}\n```"
+                        def errorMessage = "❌ Build stage <b> failed </b>:\n${e.getMessage()}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}\nConsole Output: ${env.BUILD_URL}console"
                         sendTelegramMessage(errorMessage)
                         error(errorMessage)
                     }
                 }
             }
         }
-
         stage('Test') {
             steps {
                 script {

@@ -14,10 +14,10 @@ pipeline {
         TELEGRAM_CHAT_ID = credentials('chat-id')
         BUILD_INFO = "${currentBuild.number}"
         COMMITTER = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true).trim()
-        BRANCH = env.GIT_BRANCH
+        BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
         SONARQUBE_TOKEN = credentials('sonarqube-token')
-
     }
+
     stages {
         stage('Notify Start') {
             steps {

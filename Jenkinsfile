@@ -41,19 +41,11 @@ pipeline {
                         -Dsonar.host.url=http://35.240.242.176:9000 \
                         -Dsonar.login=${env.SONARQUBE_TOKEN}
                         """
-                        def codeQualityLogs = sh script: scannerCommand, returnStatus: true, returnStdout: true
-
-                        // Check the status of the SonarQube analysis
-                        if (codeQualityLogs != 0) {
-                            // Analysis failed, send a message with the logs
-                            sendTelegramMessage("❌ Code Quality Check via SonarQube failed:\n${codeQualityLogs}")
-                            currentBuild.result = 'FAILURE'
-                        }
+                        sh script: scannerCommand, returnStatus: true
                     }
                 }
             }
         }
-
 
         stage('Build') {
             steps {

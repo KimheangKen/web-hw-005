@@ -30,20 +30,23 @@ pipeline {
         stage('Code Quality Check via SonarQube') {
             steps {
                 script {
-                def scannerHome = tool 'sonarqube-scanner';
+                    def scannerHome = tool 'sonarqube-scanner'
                     withSonarQubeEnv("sonarqube-server") {
-                    sh """
-                    ${scannerHome}/bin/sonar-scanner \
-                    -Dsonar.projectKey=test-node-js \
-                    -Dsonar.sources=. \
-                    -Dsonar.css.node=. \
-                    -Dsonar.host.url=http://35.240.242.176:9000 \
-                    -Dsonar.login=${SONARQUBE_TOKEN}
-                    """
+                        // Define environment variables securely
+                        def scannerCommand = """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=test-node-js \
+                        -Dsonar.sources=. \
+                        -Dsonar.css.node=. \
+                        -Dsonar.host.url=http://35.240.242.176:9000 \
+                        -Dsonar.login=${env.SONARQUBE_TOKEN}
+                        """
+                        sh script: scannerCommand, returnStatus: true
                     }
                 }
             }
         }
+
         stage('Build') {
             steps {
                 script {

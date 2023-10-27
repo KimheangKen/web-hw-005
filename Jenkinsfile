@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'jk-worker1'
+    }
     tools {
         nodejs 'nodejs'
     }
@@ -12,23 +14,32 @@ pipeline {
         BUILD_INFO = "${currentBuild.number}"
         COMMITTER = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true).trim()
         BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+        SONARQUBE_TOKEN = credentials('sonarqube-token')
+
     }
     stages {
         stage('Notify Start') {
             steps {
                 script {
 
-                    sendTelegramMessage("""
-                        
-                        🚀 Pipeline Started: 
-                        <b>Job Name</b>: ${env.JOB_NAME}
-                        Job Description: ${env.JOB_DESCRIPTION}
-                        Version: ${BUILD_INFO}
-                        Committer: ${COMMITTER}
-                        Branch: ${BRANCH}
-                        
-                    """)
-
+                    sendTelegramMessage("🚀 Pipeline Started:\nJob Name: ${env.JOB_NAME}\nJob Description: ${env.JOB_DESCRIPTION}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                }
+            }
+        }
+        stage('Code Quality Check via SonarQube') {
+            steps {
+                script {
+                def scannerHome = tool 'sonarqube';
+                    withSonarQubeEnv("sonarqube-server") {
+                    sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=test-node-js \
+                    -Dsonar.sources=. \
+                    -Dsonar.css.node=. \
+                    -Dsonar.host.url=http://34.143.187.28:9000 \
+                    -Dsonar.login=${SONARQUBE_TOKEN}
+                    """
+                    }
                 }
             }
         }
@@ -36,7 +47,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'npn install'
+                        sh 'npm install'
                         sh 'npm run build'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'

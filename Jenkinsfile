@@ -29,7 +29,7 @@ pipeline {
         stage('Code Quality Check via SonarQube') {
             steps {
                 script {
-                def scannerHome = tool 'sonarqube';
+                def scannerHome = tool 'sonarqube-scanner';
                     withSonarQubeEnv("sonarqube-server") {
                     sh """
                     ${scannerHome}/bin/sonar-scanner \

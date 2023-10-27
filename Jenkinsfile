@@ -37,7 +37,7 @@ pipeline {
                     -Dsonar.projectKey=test-node-js \
                     -Dsonar.sources=. \
                     -Dsonar.css.node=. \
-                    -Dsonar.host.url=http://34.143.187.28:9000 \
+                    -Dsonar.host.url=http://35.240.242.176:9000 \
                     -Dsonar.login=${SONARQUBE_TOKEN}
                     """
                     }

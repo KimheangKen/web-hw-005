@@ -44,7 +44,7 @@ module.exports = {
     prefix: "",
     themes: [
       {
-        
+        mytheme: {
 
           "primary": "#570DF8",
 
@@ -64,7 +64,7 @@ module.exports = {
 
           "error": "#F87272",
           
-        
+        },
       },
     ],
   },

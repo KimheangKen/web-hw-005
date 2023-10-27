@@ -7,7 +7,7 @@ export default function MainComponent() {
   const [data, setData] = useState([
     {
       id: 1,
-      title: "nanana",
+      title: "nanana,
       description:
         "Koh Kong Krav Beach is in the 5th place out of 13 beaches in the Koh Kong region The beach is located in a natural place, among the mountains. It is partially covered 	   by trees which give natural shade. It is a spacious coastline with crystal turquoise water and white fine sand, so you don't need special shoes.",
       status: "beach",

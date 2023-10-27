@@ -1,8 +1,8 @@
 pipeline {
-    // agent {
-    //     label 'jk-worker1'
-    // }
-    agent any
+    agent {
+        label 'jk-worker1'
+    }
+    // agent any
     tools {
         nodejs 'nodejs'
     }

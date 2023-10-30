@@ -4,27 +4,27 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  theme: {
-    fontFamily:{
-      'inconsolata' : 'Inconsolata, monospace;',
-      'sans' : 'Open Sans, sans-serif;'
-    },
-    extend: {
+  // theme: {
+  //   fontFamily:{
+  //     'inconsolata' : 'Inconsolata, monospace;',
+  //     'sans' : 'Open Sans, sans-serif;'
+  //   },
+  //   extend: {
 
-      width: {
-        'w-x': '100px',
-        'w-x2': '300px',
-        'w-wc': '100%'
-      },
-      height: {
-        'h-x': '100vh',
-      },
-      boxShadow: {
-        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
-      }
-    },
+  //     width: {
+  //       'w-x': '100px',
+  //       'w-x2': '300px',
+  //       'w-wc': '100%'
+  //     },
+  //     height: {
+  //       'h-x': '100vh',
+  //     },
+  //     boxShadow: {
+  //       '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
+  //     }
+  //   },
 
-  },
+  // },
 
 
   plugins: [

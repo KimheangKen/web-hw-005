@@ -38,7 +38,7 @@ pipeline {
                         -Dsonar.projectKey=test-node-js \
                         -Dsonar.sources=. \
                         -Dsonar.css.node=. \
-                        -Dsonar.host.url=http://35.240.242.176:9000 \
+                        -Dsonar.host.url=http://34.87.140.119:9000 \
                         -Dsonar.login=${env.SONARQUBE_TOKEN}
                         """
                         def codeQualityLogs = sh script: scannerCommand, returnStatus: true

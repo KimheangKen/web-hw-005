@@ -1,5 +1,5 @@
 # Base image
-FROM node:14-alpine AS build
+FROM registry.redhat.io/openshift3/nodejs-010-rhel7 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
